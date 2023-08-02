@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Tic Tac Toe to get your invite!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            margin: 20px auto;
+            width: 330px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 48px;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+
+        #invitation-button-wrapper {
+            margin-top: 20px;
+            display: none;
+        }
+
+        #invitation-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        #invitation-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Custom font for X and O */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Play Tic Tac Toe to get your invite!</h1>
+        <div class="board" id="board">
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <div id="invitation-button-wrapper">
+            <button id="invitation-button" onclick="getInvitation()">Get Invitation</button>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('[data-cell]');
+        const invitationButtonWrapper = document.getElementById('invitation-button-wrapper');
+        const invitationButton = document.getElementById('invitation-button');
+        let currentPlayer = 'X';
+        let gameEnded = false;
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6] // diagonals
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (cells[a].innerText && cells[a].innerText === cells[b].innerText && cells[a].innerText === cells[c].innerText) {
+                    gameEnded = true;
+                    invitationButtonWrapper.style.display = 'block';
+                    invitationButton.innerText = `Player ${cells[a].innerText} wins!`;
+                    return;
+                }
+            }
+
+            if (!Array.from(cells).some(cell => !cell.innerText)) {
+                gameEnded = true;
+                invitationButtonWrapper.style.display = 'block';
+                invitationButton.innerText = "It's a tie!";
+            }
+        }
+
+        function handleClick(event) {
+            const cell = event.target;
+            if (!cell.innerText && !gameEnded) {
+                cell.innerText = currentPlayer;
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                checkGameStatus();
+
+                if (currentPlayer === 'O' && !gameEnded) {
+                    // AI's turn
+                    makeAIMove();
+                }
+            }
+        }
+
+        function getInvitation() {
+            window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleClick));
+
+        // Additional logic to show "Get Invitation" button when the puzzle is solved
+        function showInvitationButton() {
+            invitationButtonWrapper.style.display = 'block';
+        }
+
+        function hideInvitationButton() {
+            invitationButtonWrapper.style.display = 'none';
+        }
+
+        function checkGameStatus() {
+            checkWinner();
+            if (gameEnded) {
+                showInvitationButton();
+            } else {
+                hideInvitationButton();
+            }
+        }
+
+        function evaluateBoard() {
+            // Evaluate the board and return a score
+            // Positive score if AI wins, negative score if player wins, 0 for a tie
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6] // diagonals
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (cells[a].innerText && cells[a].innerText === cells[b].innerText && cells[a].innerText === cells[c].innerText) {
+                    if (cells[a].innerText === 'X') {
+                        return -1; // Player wins
+                    } else if (cells[a].innerText === 'O') {
+                        return 1; // AI wins
+                    }
+                }
+            }
+
+            // No winner, check for a tie
+            if (!Array.from(cells).some(cell => !cell.innerText)) {
+                return 0; // Tie
+            }
+
+            // Game is still ongoing
+            return null;
+        }
+
+        function minimax(depth, isMaximizing) {
+            const score = evaluateBoard();
+
+            if (score !== null) {
+                return score;
+            }
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (const cell of cells) {
+                    if (!cell.innerText) {
+                        cell.innerText = 'O';
+                        bestScore = Math.max(bestScore, minimax(depth + 1, false));
+                        cell.innerText = '';
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (const cell of cells) {
+                    if (!cell.innerText) {
+                        cell.innerText = 'X';
+                        bestScore = Math.min(bestScore, minimax(depth + 1, true));
+                        cell.innerText = '';
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function makeAIMove() {
+            let bestScore = -Infinity;
+            let bestMove;
+            for (const cell of cells) {
+                if (!cell.innerText) {
+                    cell.innerText = 'O';
+                    const score = minimax(0, false);
+                    cell.innerText = '';
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = cell;
+                    }
+                }
+            }
+
+            bestMove.innerText = 'O';
+            currentPlayer = 'X';
+            checkGameStatus();
+        }
+    </script>
+</body>
+</html>
